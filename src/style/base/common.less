@@ -1,0 +1,40 @@
+.boxSizing {
+  box-sizing: border-box;
+}
+
+.TextEllipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[class*="vxe-"] {
+  font-variant: tabular-nums;
+  font-feature-settings: "tnum";
+  .boxSizing();
+  &:after,
+  &:before,
+  *:after,
+  *:before {
+    .boxSizing();
+  }
+}
+
+.vxe-primary-color {
+  color: @vxe-primary-color;
+}
+.vxe-success-color {
+  color: @vxe-success-color;
+}
+.vxe-info-color {
+  color: @vxe-info-color;
+}
+.vxe-warning-color {
+  color: @vxe-warning-color;
+}
+.vxe-danger-color {
+  color: @vxe-danger-color;
+}
+.vxe-perfect-color {
+  color: @vxe-table-header-background-color;
+}
