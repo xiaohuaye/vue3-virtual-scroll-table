@@ -8,6 +8,13 @@ const components = reactive([{ value: "virtualTable", label: "虚拟滚动" }]);
 
 const column = [
   {
+    title: "key",
+    dataIndex: "key",
+    key: "key",
+    width: "100px",
+    type: "checkbox",
+  },
+  {
     title: "Seq",
     dataIndex: "seq",
     key: "seq",

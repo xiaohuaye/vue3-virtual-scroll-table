@@ -21,7 +21,17 @@
             'virtual-table-th--grow': c.width === undefined ? true : false,
           }"
         >
-          {{ c.title }}
+          <div v-if="c.type === 'checkbox'">
+            <input
+              type="checkbox"
+              v-model="isAllCheck"
+              @click="onclickCheckAll"
+            />
+          </div>
+
+          <div v-else>
+            {{ c.title }}
+          </div>
         </div>
       </div>
     </div>
@@ -48,7 +58,17 @@
                     c.width === undefined ? true : false,
                 }"
               >
-                {{ item[c.dataIndex] }}
+                <div v-if="c.type === 'checkbox'">
+                  <input
+                    type="checkbox"
+                    v-model="checkArray[index]"
+                    @click="(e) => onclickCheck(e, index)"
+                  />
+                </div>
+
+                <div v-else>
+                  {{ item[c.dataIndex] }}
+                </div>
               </div>
             </div>
           </DynamicScrollerItem>
@@ -59,10 +79,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from "vue";
+import { computed, reactive, ref } from "vue";
 import { DynamicScroller, DynamicScrollerItem } from "vue-virtual-scroller";
 import { WidthCalculator } from "../utils/styleCalc";
 import type { IColumnItem } from "../types/virtualTable";
+import { CheckboxController } from "../controllers/check.controller";
 
 const props = defineProps<{
   tableWidth?: string | number;
@@ -79,8 +100,7 @@ const column = computed(() => {
   return new WidthCalculator(column, tableWidth.value).calc();
 });
 
-console.log('column', column);
-
+console.log("column", column);
 
 // 得到当前时间戳
 const now = (() => {
@@ -89,11 +109,54 @@ const now = (() => {
 
 const items = reactive(
   Array.from({ length: 1000 }).map((_, index) => ({
-    id: index,
+    key: `${index}`,
+    id: `${index}`,
     seq: `${index}`,
     message: index % 3 === 0 ? `Item ${index}` : `Item ${index}`.repeat(100),
   }))
 );
+
+// 完整数据的check Array
+const checkArray: Array<boolean> = reactive([]);
+
+items.forEach(() => {
+  checkArray.push(false);
+});
+
+const checkboxController = new CheckboxController<{
+  key: string;
+  seq: string;
+  message: string;
+}>(items, []);
+
+// 是否全选
+const isAllCheck = ref(checkboxController.getAllChecked());
+
+function onclickCheckAll(e: MouseEvent) {
+  console.log("onclickCheckAll", e);
+
+  checkboxController.allCheckedChange();
+
+  checkArray.splice(
+    0,
+    checkArray.length,
+    ...checkboxController.getAllItemsCheckStatus()
+  );
+  isAllCheck.value = checkboxController.getAllChecked();
+}
+
+function onclickCheck(e: MouseEvent, index: number) {
+  console.log("onclickCheck", e, index);
+
+  checkboxController.itemCheckedChange(index);
+
+  checkArray.splice(
+    0,
+    checkArray.length,
+    ...checkboxController.getAllItemsCheckStatus()
+  );
+  isAllCheck.value = checkboxController.getAllChecked();
+}
 </script>
 
 <style scoped lang="less">
